@@ -41,6 +41,14 @@ When the mouse moves apply a change for each x value in the intervening position
           self.trigger "move", position, lastPosition
           lastPosition = position
 
+Handle releases.
+
+      $(element).on "mouseup", (e) ->
+        self.trigger "release", localPosition(e)
+        active = false
+
+        return
+
 Whenever the mouse button is released, deactivate.
 
       $(document).on "mouseup", (e) ->
