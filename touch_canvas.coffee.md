@@ -62,7 +62,8 @@ Handle touch moves.
         # Global `event`
         # TODO: Previous touch positions
         processTouches event.changedTouches, (touch) ->
-          self.trigger "move", localPosition(touch)
+          position = localPosition(touch)
+          self.trigger "move", position, position
 
 Handle releases.
 
@@ -97,7 +98,7 @@ Process touches
 
       processTouches = (touches, fn) ->
         self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->
-          "[#{identifier}: #{pageX}, #{pageY}]"
+          "[#{identifier}: #{pageX}, #{pageY}]\n"
 
         Array::forEach.call touches, fn
 
