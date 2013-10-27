@@ -77,11 +77,8 @@ Handle touch ends.
 
       $(element).on "touchend", (e) ->
         # Global `event`
-        processTouches event, (touch) ->
-          self.trigger "release", localPosition(touch)
-
-      $(document).on "touchend", (e) ->
-        # Global `event`
+        # HACK: touchend touches list is always empty
+        event.touches = event.changedTouches
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
 
