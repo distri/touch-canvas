@@ -37,7 +37,7 @@ Handle touch starts
 
       $(element).on "touchstart", (e) ->
         # Global `event`
-        processTouches event.changedTouches, (touch) ->
+        processTouches event, (touch) ->
           self.trigger "touch", localPosition(touch)
 
 When the mouse moves apply a change for each x value in the intervening positions.
@@ -61,7 +61,7 @@ Handle touch moves.
       $(element).on "touchmove", (e) ->
         # Global `event`
         # TODO: Previous touch positions
-        processTouches event.changedTouches, (touch) ->
+        processTouches event, (touch) ->
           position = localPosition(touch)
           self.trigger "move", position, position
 
@@ -77,7 +77,7 @@ Handle touch ends.
 
       $(element).on "touchend", (e) ->
         # Global `event`
-        processTouches event.changedTouches, (touch) ->
+        processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
 
 Whenever the mouse button is released from anywhere, deactivate. Be sure to
@@ -96,7 +96,9 @@ Helpers
 
 Process touches
 
-      processTouches = (touches, fn) ->
+      processTouches = (event, fn) ->
+        touches = event.touches
+
         self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->
           "[#{identifier}: #{pageX}, #{pageY}]\n"
 
