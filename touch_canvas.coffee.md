@@ -77,8 +77,6 @@ Handle touch ends.
 
       $(element).on "touchend", (e) ->
         # Global `event`
-        # HACK: touchend touches list is always empty
-        event.touches = event.changedTouches
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
 
@@ -100,7 +98,12 @@ Process touches
 
       processTouches = (event, fn) ->
         event.preventDefault()
-        touches = event.touches
+
+        if event.type is "touchend"
+          # touchend doesn't have any touches, but does have changed touches
+          touches = event.changedTouches
+        else
+          touches = event.touches
 
         self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->
           "[#{identifier}: #{pageX}, #{pageY} (#{event.type})]\n"
