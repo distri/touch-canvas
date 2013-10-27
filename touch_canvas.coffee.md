@@ -3,9 +3,6 @@ Touch Canvas
 
 A canvas element that reports mouse and touch events in the range [0, 1].
 
-TODO: Pass identifier through in events with position.
-TODO: Don't pass previous position, let clients maintain that if they wish.
-
     PixieCanvas = require "pixie-canvas"
 
 A number really close to 1. We should never actually return 1, but move events
