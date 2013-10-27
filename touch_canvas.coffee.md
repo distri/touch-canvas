@@ -36,6 +36,8 @@ When we click within the canvas set the value for the position we clicked at.
 Handle touch starts
 
       $(element).on "touchstart", (e) ->
+        e.preventDefault()
+
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "touch", localPosition(touch)
@@ -59,6 +61,8 @@ Handle moves outside of the element.
 Handle touch moves.
 
       $(element).on "touchmove", (e) ->
+        e.preventDefault()
+
         # Global `event`
         # TODO: Previous touch positions
         processTouches event, (touch) ->
@@ -76,6 +80,8 @@ Handle releases.
 Handle touch ends.
 
       $(element).on "touchend", (e) ->
+        e.preventDefault()
+
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
