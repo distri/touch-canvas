@@ -80,7 +80,7 @@ Handle touch ends.
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
 
-      $(element).on "touchcancel", (e) ->
+      $(document).on "touchend", (e) ->
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
