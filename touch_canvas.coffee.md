@@ -3,7 +3,8 @@ Touch Canvas
 
 A canvas element that reports mouse and touch events in the range [0, 1].
 
-TODO: Add multi-touch event support.
+TODO: Pass identifier through in events with position.
+TODO: Don't pass previous position, let clients maintain that if they wish.
 
     PixieCanvas = require "pixie-canvas"
 
@@ -21,17 +22,15 @@ may get a little fast and loose with exiting the canvas, so let's play it safe.
 
       element = self.element()
 
+      # Keep track of if the mouse is active in the element
       active = false
-      lastPosition = null
 
 When we click within the canvas set the value for the position we clicked at.
 
       $(element).on "mousedown", (e) ->
         active = true
 
-        position = localPosition(e)
-        self.trigger "touch", position
-        lastPosition = position
+        self.trigger "touch", localPosition(e)
 
 Handle touch starts
 
@@ -44,26 +43,20 @@ When the mouse moves apply a change for each x value in the intervening position
 
       $(element).on "mousemove", (e) ->
         if active
-          position = localPosition(e)
-          self.trigger "move", position, lastPosition
-          lastPosition = position
+          self.trigger "move", localPosition(e)
 
 Handle moves outside of the element.
 
       $(document).on "mousemove", (e) ->
         if active
-          position = localPosition(e)
-          self.trigger "move", position, lastPosition
-          lastPosition = position
+          self.trigger "move", localPosition(e)
 
 Handle touch moves.
 
       $(element).on "touchmove", (e) ->
         # Global `event`
-        # TODO: Previous touch positions
         processTouches event, (touch) ->
-          position = localPosition(touch)
-          self.trigger "move", position, position
+          self.trigger "move", localPosition(touch)
 
 Handle releases.
 
@@ -115,14 +108,19 @@ Local event position.
       localPosition = (e) ->
         $currentTarget = $(element)
         offset = $currentTarget.offset()
-  
+
         width = $currentTarget.width()
         height = $currentTarget.height()
 
-        Point(
+        point = Point(
           ((e.pageX - offset.left) / width).clamp(0, MAX)
           ((e.pageY - offset.top) / height).clamp(0, MAX)
         )
+
+        # Add mouse into touch identifiers as 0
+        point.identifier = (e.identifier + 1) or 0
+
+        return point
 
 Return self
 
