@@ -3,7 +3,7 @@ Touch Canvas
 
 A canvas element that reports mouse and touch events in the range [0, 1].
 
-TODO: Add touch event support.
+TODO: Add multi-touch event support.
 
     PixieCanvas = require "pixie-canvas"
 
@@ -33,6 +33,13 @@ When we click within the canvas set the value for the position we clicked at.
         self.trigger "touch", position
         lastPosition = position
 
+Handle touch starts
+
+      $(element).on "touchstart", (e) ->
+        # Global `event`
+        Array::forEach.call event.changedTouches, (touch) ->
+          self.trigger "touch", localPosition(touch)
+
 When the mouse moves apply a change for each x value in the intervening positions.
 
       $(element).on "mousemove", (e) ->
@@ -40,6 +47,24 @@ When the mouse moves apply a change for each x value in the intervening position
           position = localPosition(e)
           self.trigger "move", position, lastPosition
           lastPosition = position
+
+Handle moves outside of the element.
+
+      $(document).on "mousemove", (e) ->
+        if active
+          [oldTarget, e.currentTarget] = [e.currentTarget, element]
+          position = localPosition(e)
+          self.trigger "move", position, lastPosition
+          lastPosition = position
+          e.currentTarget = oldTarget
+
+Handle touch moves.
+
+      $(element).on "touchmove", (e) ->
+        # Global `event`
+        # TODO: Previous touch positions
+        Array::forEach.call event.changedTouches, (touch) ->
+          self.trigger "move", localPosition(touch)
 
 Handle releases.
 
@@ -49,10 +74,25 @@ Handle releases.
 
         return
 
-Whenever the mouse button is released, deactivate.
+Handle touch ends.
+
+      $(element).on "touchend", (e) ->
+        # Global `event`
+        Array::forEach.call event.changedTouches, (touch) ->
+          self.trigger "release", localPosition(touch)
+
+Whenever the mouse button is released from anywhere, deactivate. Be sure to
+trigger the release event if the mousedown started within the element.
 
       $(document).on "mouseup", (e) ->
+        if active
+          [oldTarget, e.currentTarget] = [e.currentTarget, element]
+          self.trigger "release", localPosition(e)
+          e.currentTarget = oldTarget
+
         active = false
+
+        return
 
       return self
 
