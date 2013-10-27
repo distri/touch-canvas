@@ -37,7 +37,7 @@ Handle touch starts
 
       $(element).on "touchstart", (e) ->
         # Global `event`
-        Array::forEach.call event.changedTouches, (touch) ->
+        processTouches event.changedTouches, (touch) ->
           self.trigger "touch", localPosition(touch)
 
 When the mouse moves apply a change for each x value in the intervening positions.
@@ -52,18 +52,16 @@ Handle moves outside of the element.
 
       $(document).on "mousemove", (e) ->
         if active
-          [oldTarget, e.currentTarget] = [e.currentTarget, element]
           position = localPosition(e)
           self.trigger "move", position, lastPosition
           lastPosition = position
-          e.currentTarget = oldTarget
 
 Handle touch moves.
 
       $(element).on "touchmove", (e) ->
         # Global `event`
         # TODO: Previous touch positions
-        Array::forEach.call event.changedTouches, (touch) ->
+        processTouches event.changedTouches, (touch) ->
           self.trigger "move", localPosition(touch)
 
 Handle releases.
@@ -78,7 +76,7 @@ Handle touch ends.
 
       $(element).on "touchend", (e) ->
         # Global `event`
-        Array::forEach.call event.changedTouches, (touch) ->
+        processTouches event.changedTouches, (touch) ->
           self.trigger "release", localPosition(touch)
 
 Whenever the mouse button is released from anywhere, deactivate. Be sure to
@@ -86,33 +84,41 @@ trigger the release event if the mousedown started within the element.
 
       $(document).on "mouseup", (e) ->
         if active
-          [oldTarget, e.currentTarget] = [e.currentTarget, element]
           self.trigger "release", localPosition(e)
-          e.currentTarget = oldTarget
 
         active = false
 
         return
+
+Helpers
+-------
+
+Process touches
+
+      processTouches = (touches, fn) ->
+        self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->
+          "[#{identifier}: #{pageX}, #{pageY}]"
+
+        Array::forEach.call touches, fn
+
+Local event position.
+
+      localPosition = (e) ->
+        $currentTarget = $(element)
+        offset = $currentTarget.offset()
+  
+        width = $currentTarget.width()
+        height = $currentTarget.height()
+
+        Point(
+          ((e.pageX - offset.left) / width).clamp(0, MAX)
+          ((e.pageY - offset.top) / height).clamp(0, MAX)
+        )
+
+Return self
 
       return self
 
 Export
 
     module.exports = TouchCanvas
-
-Helpers
--------
-
-Local event position.
-
-    localPosition = (e) ->
-      $currentTarget = $(e.currentTarget)
-      offset = $currentTarget.offset()
-
-      width = $currentTarget.width()
-      height = $currentTarget.height()
-
-      Point(
-        ((e.pageX - offset.left) / width).clamp(0, MAX)
-        ((e.pageY - offset.top) / height).clamp(0, MAX)
-      )
