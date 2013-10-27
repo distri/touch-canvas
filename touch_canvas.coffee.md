@@ -97,10 +97,11 @@ Helpers
 Process touches
 
       processTouches = (event, fn) ->
+        event.preventDefault()
         touches = event.touches
 
         self.debug? Array::map.call touches, ({identifier, pageX, pageY}) ->
-          "[#{identifier}: #{pageX}, #{pageY}]\n"
+          "[#{identifier}: #{pageX}, #{pageY} (#{event.type})]\n"
 
         Array::forEach.call touches, fn
 
