@@ -33,7 +33,6 @@
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
               <p>A canvas element that reports mouse and touch events in the range [0, 1].</p>
-<p>TODO: Add touch event support.</p>
 
             </div>
             <div class="content"><pre><code class="lang-coffeescript">PixieCanvas = require <span class="string">"pixie-canvas"</span></code></pre>
@@ -61,8 +60,8 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
 
   element = self.element()
 
-  active = <span class="literal">false</span>
-  lastPosition = <span class="literal">null</span></code></pre>
+  <span class="comment"># Keep track of if the mouse is active in the element</span>
+  active = <span class="literal">false</span></code></pre>
 </div>
         </li>
         
@@ -78,9 +77,7 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
             <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"mousedown"</span>, (e) -&gt;
     active = <span class="literal">true</span>
 
-    position = localPosition(e)
-    self.trigger <span class="string">"touch"</span>, position
-    lastPosition = position</code></pre>
+    self.trigger <span class="string">"touch"</span>, localPosition(e)</code></pre>
 </div>
         </li>
         
@@ -90,14 +87,13 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>When the mouse moves apply a change for each x value in the intervening positions.</p>
+              <p>Handle touch starts</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"mousemove"</span>, (e) -&gt;
-    <span class="keyword">if</span> active
-      position = localPosition(e)
-      self.trigger <span class="string">"move"</span>, position, lastPosition
-      lastPosition = position</code></pre>
+            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"touchstart"</span>, (e) -&gt;
+    <span class="comment"># Global `event`</span>
+    processTouches event, (touch) -&gt;
+      self.trigger <span class="string">"touch"</span>, localPosition(touch)</code></pre>
 </div>
         </li>
         
@@ -107,13 +103,12 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>Whenever the mouse button is released, deactivate.</p>
+              <p>When the mouse moves apply a change for each x value in the intervening positions.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">  $(document).<span class="literal">on</span> <span class="string">"mouseup"</span>, (e) -&gt;
-    active = <span class="literal">false</span>
-
-  <span class="keyword">return</span> self</code></pre>
+            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"mousemove"</span>, (e) -&gt;
+    <span class="keyword">if</span> active
+      self.trigger <span class="string">"move"</span>, localPosition(e)</code></pre>
 </div>
         </li>
         
@@ -123,10 +118,12 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>Export</p>
+              <p>Handle moves outside of the element.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript">module.exports = TouchCanvas</code></pre>
+            <div class="content"><pre><code class="lang-coffeescript">  $(document).<span class="literal">on</span> <span class="string">"mousemove"</span>, (e) -&gt;
+    <span class="keyword">if</span> active
+      self.trigger <span class="string">"move"</span>, localPosition(e)</code></pre>
 </div>
         </li>
         
@@ -135,6 +132,75 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
             <div class="annotation">
               <div class="pilwrap">
                 <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Handle touch moves.</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"touchmove"</span>, (e) -&gt;
+    <span class="comment"># Global `event`</span>
+    processTouches event, (touch) -&gt;
+      self.trigger <span class="string">"move"</span>, localPosition(touch)</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Handle releases.</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"mouseup"</span>, (e) -&gt;
+    self.trigger <span class="string">"release"</span>, localPosition(e)
+    active = <span class="literal">false</span>
+
+    <span class="keyword">return</span></code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Handle touch ends.</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  $(element).<span class="literal">on</span> <span class="string">"touchend"</span>, (e) -&gt;
+    <span class="comment"># Global `event`</span>
+    processTouches event, (touch) -&gt;
+      self.trigger <span class="string">"release"</span>, localPosition(touch)</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Whenever the mouse button is released from anywhere, deactivate. Be sure to
+trigger the release event if the mousedown started within the element.</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  $(document).<span class="literal">on</span> <span class="string">"mouseup"</span>, (e) -&gt;
+    <span class="keyword">if</span> active
+      self.trigger <span class="string">"release"</span>, localPosition(e)
+
+    active = <span class="literal">false</span>
+
+    <span class="keyword">return</span></code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <h2 id="helpers">Helpers</h2>
 
@@ -145,25 +211,81 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
         </li>
         
         
-        <li id="section-9">
+        <li id="section-13">
             <div class="annotation">
               <div class="pilwrap">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Process touches</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  <span class="function"><span class="title">processTouches</span></span> = (event, fn) -&gt;
+    event.preventDefault()
+
+    <span class="keyword">if</span> event.type <span class="keyword">is</span> <span class="string">"touchend"</span>
+      <span class="comment"># touchend doesn't have any touches, but does have changed touches</span>
+      touches = event.changedTouches
+    <span class="keyword">else</span>
+      touches = event.touches
+
+    self.debug? Array::map.call touches, ({identifier, pageX, pageY}) -&gt;
+      <span class="string">"[<span class="subst">#{identifier}</span>: <span class="subst">#{pageX}</span>, <span class="subst">#{pageY}</span> (<span class="subst">#{event.type}</span>)]\n"</span>
+
+    Array::forEach.call touches, fn</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
               <p>Local event position.</p>
 
             </div>
-            <div class="content"><pre><code class="lang-coffeescript"><span class="function"><span class="title">localPosition</span></span> = (e) -&gt;
-  $currentTarget = $(e.currentTarget)
-  offset = $currentTarget.offset()
+            <div class="content"><pre><code class="lang-coffeescript">  <span class="function"><span class="title">localPosition</span></span> = (e) -&gt;
+    $currentTarget = $(element)
+    offset = $currentTarget.offset()
 
-  width = $currentTarget.width()
-  height = $currentTarget.height()
+    width = $currentTarget.width()
+    height = $currentTarget.height()
 
-  Point(
-    ((e.pageX - offset.left) / width).clamp(<span class="number">0</span>, MAX)
-    ((e.pageY - offset.top) / height).clamp(<span class="number">0</span>, MAX)
-  )</code></pre>
+    point = Point(
+      ((e.pageX - offset.left) / width).clamp(<span class="number">0</span>, MAX)
+      ((e.pageY - offset.top) / height).clamp(<span class="number">0</span>, MAX)
+    )
+
+    <span class="comment"># Add mouse into touch identifiers as 0</span>
+    point.identifier = (e.identifier + <span class="number">1</span>) <span class="keyword">or</span> <span class="number">0</span>
+
+    <span class="keyword">return</span> point</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Return self</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">  <span class="keyword">return</span> self</code></pre>
+</div>
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              <div class="pilwrap">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Export</p>
+
+            </div>
+            <div class="content"><pre><code class="lang-coffeescript">module.exports = TouchCanvas</code></pre>
 </div>
         </li>
         
@@ -172,7 +294,15 @@ may get a little fast and loose with exiting the canvas, so let&#39;s play it sa
   <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/coffee-script/1.6.3/coffee-script.min.js"></script>
 <script src="http://strd6.github.io/require/v0.2.2.js"></script>
-<script src="http://strd6.github.io/interactive/v0.8.0.js"></script>
-<script src="http://strd6.github.io/tempest/javascripts/envweb.js"></script><script src="package.js"></script>
+<script src="http://strd6.github.io/tempest/javascripts/envweb.js"></script><script>
+  $.ajax({
+    url: "http://strd6.github.io/interactive/v0.8.1.jsonp",
+    dataType: "jsonp",
+    jsonpCallback: "STRd6/interactive:v0.8.1",
+    cache: true
+  }).then(function(PACKAGE) {
+    Require.generateFor(PACKAGE)("./" + PACKAGE.entryPoint)
+  })
+</script><script src="package.js"></script>
 </body>
 </html>
