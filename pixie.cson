@@ -6,4 +6,4 @@ remoteDependencies: [
   "http://strd6.github.io/require/v0.2.2.js"
 ]
 dependencies:
-  "pixie-canvas": "STRd6/pixie-canvas:v0.8.1"
+  "pixie-canvas": "distri/pixie-canvas:v0.9.1"
