@@ -1,8 +1,6 @@
 entryPoint: "touch_canvas"
-version: "0.3.0"
-remoteDependencies: [
-  "//code.jquery.com/jquery-1.10.1.min.js"
-  "http://strd6.github.io/tempest/javascripts/envweb.js"
-]
+version: "0.3.1"
 dependencies:
-  "pixie-canvas": "distri/pixie-canvas:v0.9.1"
+  "bindable": "distri/bindable:v0.1.0"
+  "core": "distri/core:v0.6.0"
+  "pixie-canvas": "distri/pixie-canvas:v0.9.2"

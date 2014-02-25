@@ -1,8 +1,36 @@
 Touch Canvas
 ============
 
+Demo
+----
+
+>     #! demo
+>     paint = (position) ->
+>       x = position.x * canvas.width()
+>       y = position.y * canvas.height()
+>
+>       canvas.drawCircle
+>         radius: 10
+>         color: "red"
+>         position:
+>           x: x
+>           y: y
+>
+>     canvas.on "touch", (p) ->
+>       paint(p)
+>
+>     canvas.on "move", (p) ->
+>       paint(p)
+
+----
+
+Implementation
+--------------
+
 A canvas element that reports mouse and touch events in the range [0, 1].
 
+    Bindable = require "bindable"
+    Core = require "core"
     PixieCanvas = require "pixie-canvas"
 
 A number really close to 1. We should never actually return 1, but move events
@@ -24,40 +52,40 @@ may get a little fast and loose with exiting the canvas, so let's play it safe.
 
 When we click within the canvas set the value for the position we clicked at.
 
-      $(element).on "mousedown", (e) ->
+      listen element, "mousedown", (e) ->
         active = true
 
         self.trigger "touch", localPosition(e)
 
 Handle touch starts
 
-      $(element).on "touchstart", (e) ->
+      listen element, "touchstart", (e) ->
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "touch", localPosition(touch)
 
 When the mouse moves apply a change for each x value in the intervening positions.
 
-      $(element).on "mousemove", (e) ->
+      listen element, "mousemove", (e) ->
         if active
           self.trigger "move", localPosition(e)
 
 Handle moves outside of the element.
 
-      $(document).on "mousemove", (e) ->
+      listen document, "mousemove", (e) ->
         if active
           self.trigger "move", localPosition(e)
 
 Handle touch moves.
 
-      $(element).on "touchmove", (e) ->
+      listen element, "touchmove", (e) ->
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "move", localPosition(touch)
 
 Handle releases.
 
-      $(element).on "mouseup", (e) ->
+      listen element, "mouseup", (e) ->
         self.trigger "release", localPosition(e)
         active = false
 
@@ -65,7 +93,7 @@ Handle releases.
 
 Handle touch ends.
 
-      $(element).on "touchend", (e) ->
+      listen element, "touchend", (e) ->
         # Global `event`
         processTouches event, (touch) ->
           self.trigger "release", localPosition(touch)
@@ -73,7 +101,7 @@ Handle touch ends.
 Whenever the mouse button is released from anywhere, deactivate. Be sure to
 trigger the release event if the mousedown started within the element.
 
-      $(document).on "mouseup", (e) ->
+      listen document, "mouseup", (e) ->
         if active
           self.trigger "release", localPosition(e)
 
@@ -103,16 +131,11 @@ Process touches
 Local event position.
 
       localPosition = (e) ->
-        $currentTarget = $(element)
-        offset = $currentTarget.offset()
+        rect = element.getBoundingClientRect()
 
-        width = $currentTarget.width()
-        height = $currentTarget.height()
-
-        point = Point(
-          ((e.pageX - offset.left) / width).clamp(0, MAX)
-          ((e.pageY - offset.top) / height).clamp(0, MAX)
-        )
+        point =
+          x: clamp (e.pageX - rect.left) / rect.width, 0, MAX
+          y: clamp (e.pageY - rect.top) / rect.height, 0, MAX
 
         # Add mouse into touch identifiers as 0
         point.identifier = (e.identifier + 1) or 0
@@ -123,6 +146,32 @@ Return self
 
       return self
 
+Attach an event listener to an element
+
+    listen = (element, event, handler) ->
+      element.addEventListener(event, handler, false)
+
+Clamp a number to be within a range.
+
+    clamp = (number, min, max) ->
+      Math.min(Math.max(number, min), max)
+
 Export
 
     module.exports = TouchCanvas
+
+Interactive Examples
+--------------------
+
+>     #! setup
+>     TouchCanvas = require "/touch_canvas"
+>
+>     Interactive.register "demo", ({source, runtimeElement}) ->
+>       canvas = TouchCanvas
+>         width: 400
+>         height: 200
+>
+>       code = CoffeeScript.compile(source)
+>
+>       runtimeElement.empty().append canvas.element()
+>       Function("canvas", code)(canvas)
