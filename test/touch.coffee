@@ -19,7 +19,7 @@ describe "TouchCanvas", ->
     assert c
 
     document.body.appendChild(c.element())
-  
+
   it "should fire events", (done) ->
     canvas = TouchCanvas()
 
