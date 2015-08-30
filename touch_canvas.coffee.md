@@ -1,6 +1,8 @@
 Touch Canvas
 ============
 
+A canvas you can TOUCH!
+
 Demo
 ----
 
@@ -27,16 +29,18 @@ Demo
 Implementation
 --------------
 
-A canvas element that reports mouse and touch events in the range [0, 1].
+A canvas element that reports mouse and touch events. The events
+are scaled to the size of the canvas with [0, 0] being in the top
+left and a number close to 1 being in the bottom right.
+
+We track movement outside of the element so the positions are not
+clamped and return their true value if the canvas were to extend.
+This means that it is possible to receive negative numbers and
+numbers >= 1 for positions.
 
     Bindable = require "bindable"
     Core = require "core"
     PixieCanvas = require "pixie-canvas"
-
-A number really close to 1. We should never actually return 1, but move events
-may get a little fast and loose with exiting the canvas, so let's play it safe.
-
-    MAX = 0.999999999999
 
     TouchCanvas = (I={}) ->
       self = PixieCanvas I
@@ -53,6 +57,7 @@ may get a little fast and loose with exiting the canvas, so let's play it safe.
 When we click within the canvas set the value for the position we clicked at.
 
       listen element, "mousedown", (e) ->
+        e.preventDefault()
         active = true
 
         self.trigger "touch", localPosition(e)
@@ -64,13 +69,14 @@ Handle touch starts
         processTouches event, (touch) ->
           self.trigger "touch", localPosition(touch)
 
-When the mouse moves apply a change for each x value in the intervening positions.
+When the mouse moves trigger an event with the current position.
 
       listen element, "mousemove", (e) ->
+        e.preventDefault()
         if active
           self.trigger "move", localPosition(e)
 
-Handle moves outside of the element.
+Handle moves outside of the element if the action was initiated within the element.
 
       listen document, "mousemove", (e) ->
         if active
@@ -102,6 +108,7 @@ Whenever the mouse button is released from anywhere, deactivate. Be sure to
 trigger the release event if the mousedown started within the element.
 
       listen document, "mouseup", (e) ->
+        e.preventDefault()
         if active
           self.trigger "release", localPosition(e)
 
@@ -134,8 +141,8 @@ Local event position.
         rect = element.getBoundingClientRect()
 
         point =
-          x: clamp (e.pageX - rect.left) / rect.width, 0, MAX
-          y: clamp (e.pageY - rect.top) / rect.height, 0, MAX
+          x: (e.pageX - rect.left) / rect.width
+          y: (e.pageY - rect.top) / rect.height
 
         # Add mouse into touch identifiers as 0
         point.identifier = (e.identifier + 1) or 0
@@ -151,17 +158,14 @@ Attach an event listener to an element
     listen = (element, event, handler) ->
       element.addEventListener(event, handler, false)
 
-Clamp a number to be within a range.
-
-    clamp = (number, min, max) ->
-      Math.min(Math.max(number, min), max)
-
 Export
 
     module.exports = TouchCanvas
 
 Interactive Examples
 --------------------
+
+This is what is used to set up the demo at the beginning of this document.
 
 >     #! setup
 >     TouchCanvas = require "/touch_canvas"
