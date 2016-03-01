@@ -108,7 +108,6 @@ Whenever the mouse button is released from anywhere, deactivate. Be sure to
 trigger the release event if the mousedown started within the element.
 
       listen document, "mouseup", (e) ->
-        e.preventDefault()
         if active
           self.trigger "release", localPosition(e)
 
