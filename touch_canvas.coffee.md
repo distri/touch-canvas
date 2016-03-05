@@ -57,7 +57,6 @@ numbers >= 1 for positions.
 When we click within the canvas set the value for the position we clicked at.
 
       listen element, "mousedown", (e) ->
-        e.preventDefault()
         active = true
 
         self.trigger "touch", localPosition(e)
@@ -72,7 +71,6 @@ Handle touch starts
 When the mouse moves trigger an event with the current position.
 
       listen element, "mousemove", (e) ->
-        e.preventDefault()
         if active
           self.trigger "move", localPosition(e)
 

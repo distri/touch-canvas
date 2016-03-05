@@ -1,5 +1,5 @@
 entryPoint: "touch_canvas"
-version: "0.4.1"
+version: "0.4.2"
 dependencies:
   "bindable": "distri/bindable:v0.1.0"
   "core": "distri/core:v0.6.0"
