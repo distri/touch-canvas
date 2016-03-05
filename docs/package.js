@@ -199,7 +199,7 @@
     },
     "pixie.cson": {
       "path": "pixie.cson",
-      "content": "entryPoint: \"touch_canvas\"\nversion: \"0.4.2\"\ndependencies:\n  \"bindable\": \"distri/bindable:v0.1.0\"\n  \"core\": \"distri/core:v0.6.0\"\n  \"pixie-canvas\": \"distri/pixie-canvas:v0.9.2\"\n",
+      "content": "entryPoint: \"touch_canvas\"\nversion: \"0.4.2-pre.0\"\ndependencies:\n  \"bindable\": \"distri/bindable:v0.1.0\"\n  \"core\": \"distri/core:v0.6.0\"\n  \"pixie-canvas\": \"distri/pixie-canvas:v0.9.2\"\n",
       "mode": "100644",
       "type": "blob"
     },
@@ -219,7 +219,7 @@
   "distribution": {
     "pixie": {
       "path": "pixie",
-      "content": "module.exports = {\"entryPoint\":\"touch_canvas\",\"version\":\"0.4.2\",\"dependencies\":{\"bindable\":\"distri/bindable:v0.1.0\",\"core\":\"distri/core:v0.6.0\",\"pixie-canvas\":\"distri/pixie-canvas:v0.9.2\"}};",
+      "content": "module.exports = {\"entryPoint\":\"touch_canvas\",\"version\":\"0.4.2-pre.0\",\"dependencies\":{\"bindable\":\"distri/bindable:v0.1.0\",\"core\":\"distri/core:v0.6.0\",\"pixie-canvas\":\"distri/pixie-canvas:v0.9.2\"}};",
       "type": "blob"
     },
     "test/touch": {
@@ -236,7 +236,7 @@
   "progenitor": {
     "url": "https://danielx.net/editor/"
   },
-  "version": "0.4.2",
+  "version": "0.4.2-pre.0",
   "entryPoint": "touch_canvas",
   "repository": {
     "branch": "master",
