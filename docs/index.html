@@ -119,7 +119,6 @@ PixieCanvas = require <span class="string">"pixie-canvas"</span>
 
   </div>
   <div class="content"><pre><code class="lang-coffeescript">  listen element, <span class="string">"mousedown"</span>, (e) -&gt;
-    e.preventDefault()
     active = <span class="literal">true</span>
 
     self.trigger <span class="string">"touch"</span>, localPosition(e)</code></pre>
@@ -148,7 +147,6 @@ PixieCanvas = require <span class="string">"pixie-canvas"</span>
 
   </div>
   <div class="content"><pre><code class="lang-coffeescript">  listen element, <span class="string">"mousemove"</span>, (e) -&gt;
-    e.preventDefault()
     <span class="keyword">if</span> active
       self.trigger <span class="string">"move"</span>, localPosition(e)</code></pre>
 </div>
